@@ -1,0 +1,10 @@
+{
+  "portApp": 7002,
+  "MongoServer": {
+    "ip": "xizor.sodimac.cl",
+    "port": "27017",
+    "schema": "TRAZAHUB",
+    "user":"trazahub_db",
+    "pass":"wGAGKv5Hou"
+  }
+}

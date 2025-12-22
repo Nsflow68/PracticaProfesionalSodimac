@@ -1,0 +1,30 @@
+{
+  "name": "api_get_info_wmos",
+  "version": "1.0.0",
+  "description": "Servicio para obtener informacion de wmos",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git-dda.sodimac.cl:dda/hansolo/trazabilidadhub/api_get_info_wmos.git"
+  },
+  "author": "Pamela Opazo",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
+    "moment": "^2.29.1",
+    "mongoose": "^7.6.3",
+    "mongodb": "5.9.2",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

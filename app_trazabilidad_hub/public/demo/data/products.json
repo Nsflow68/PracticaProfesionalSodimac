@@ -1,0 +1,10 @@
+
+{
+    "data": [
+        {"tienda":"88","periodoInicio":"2023-01","periodoFin":"2023-03","cotas":"2012","totalCotas":"5"},
+        {"tienda":"88","periodoInicio":"2023-01","periodoFin":"2023-03","cotas":"2000","totalCotas":"3"},
+        {"tienda":"88","periodoInicio":"2023-04","periodoFin":"2023-06","cotas":"2012","totalCotas":"4"},
+        {"tienda":"88","periodoInicio":"2023-04","periodoFin":"2023-06","cotas":"2000","totalCotas":"3"}
+    ]
+}
+    

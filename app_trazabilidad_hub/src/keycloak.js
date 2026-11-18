@@ -36,8 +36,6 @@ export default {
     
     getAccessToken() {
         try {
-            console.log("starting getAccessToken.....")
-            console.log("isTokenExpired: ", _keycloak.isTokenExpired())
             return _keycloak.token;
         } catch (error) {
             return null; 

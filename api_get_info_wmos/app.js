@@ -1,14 +1,8 @@
-process.env.SERVER = 'profesor.sodimac.cl';
-process.env.PORT_BD = 27017;
-process.env.SCHEMA_BD = 'TRAZAHUB';
-process.env.ID_APP = '606c13f4cf82d85bc86c863e';
-
 const express = require('express');
 const app = express();
 app.disable('x-powered-by');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const config = require('./config');
 const mongoose = require('mongoose');
 
 const getDataWmos = require('./controller/getDataWmos/getDataWmos');
@@ -21,12 +15,7 @@ const urlencodedParser = bodyParser.urlencoded({ limit: '50mb', extended: true }
 
 app.enable('trust proxy');
 
-const allowedOrigins = [
-    'https://hansolo.dda.sodimac.cl:7002',
-    'https://thanos.dda.sodimac.cl:7002',
-    'https://kurama.dda.sodimac.cl:8443',
-    'https://trazabilidad-hub.dda.sodimac.cl'
-];
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(value => value.trim()).filter(Boolean);
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -93,9 +82,13 @@ app.use((err, req, res, next) => {
 
 const server = require('./httpx').createServer(app);
 
-mongoose.connect(`mongodb://${config.MongoServer.user}:${config.MongoServer.pass}@${config.MongoServer.ip}:${config.MongoServer.port}/${config.MongoServer.schema}`);
+if (!process.env.MONGO_URI || !process.env.ID_APP) {
+    throw new Error('MONGO_URI and ID_APP environment variables are required');
+}
 
-settingModel.findOne({ idApp: '606c13f4cf82d85bc86c863e' })
+mongoose.connect(process.env.MONGO_URI);
+
+settingModel.findOne({ idApp: process.env.ID_APP })
     .then(doc => {
         if (!doc) {
             console.error('Settings not found');
@@ -104,7 +97,6 @@ settingModel.findOne({ idApp: '606c13f4cf82d85bc86c863e' })
         global.__setting = doc._doc;
         global.__nameProject = doc._doc.nameApp;
 
-        console.log(global.__setting);
         server.listen(doc._doc.portApp, () => {
             console.log(`${doc._doc.nameApp.toUpperCase()} escuchando en puerto ${server.address().port}`);
         });

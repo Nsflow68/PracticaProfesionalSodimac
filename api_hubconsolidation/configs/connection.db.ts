@@ -20,6 +20,10 @@ export const dbConnection = async () => {
 
 
 const normLpn = (v: string) => String(v ?? "").trim().toUpperCase();
+const sqlSchema = process.env.SQLDB;
+if (!sqlSchema || !/^[A-Za-z0-9_]+$/.test(sqlSchema)) {
+  throw new Error("SQLDB must be configured with a valid schema name");
+}
 
 export const detailConsolidate = async (olpn1: string, olpn2: string) => {
   const a = normLpn(olpn1);
@@ -29,7 +33,7 @@ export const detailConsolidate = async (olpn1: string, olpn2: string) => {
   
   const sql = `
     SELECT *
-    FROM trazabilidad_hub.carton
+    FROM ${sqlSchema}.carton
     WHERE olpn IN (?, ?)
   `;
   const response: any[] = await selectData(sql, [a, b]);
@@ -47,11 +51,11 @@ export const detailConsolidate = async (olpn1: string, olpn2: string) => {
 };
 
 const config: PoolOptions = {
-  host: process.env.SQLHOST ?? "Obiwankenobi.sodimac.cl",
+  host: process.env.SQLHOST,
   port: 3306,
-  user: process.env.SQLUSER ?? "trazabilidadhub",
-  database: process.env.SQLDB ?? "trazabilidad_hub",
-  password: process.env.SQLPASS ?? "e5f3b0d88a9ad2895f6d387a68d86aa7",
+  user: process.env.SQLUSER,
+  database: process.env.SQLDB,
+  password: process.env.SQLPASS,
   rowsAsArray: false,
 };
 

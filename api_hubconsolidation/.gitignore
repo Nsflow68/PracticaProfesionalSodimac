@@ -3,3 +3,6 @@ dist
 .vscode
 .idea
 package-lock.json
+.env
+.env.*
+!.env.example

@@ -25,71 +25,45 @@ export default class Server {
     this.app = express();
     this.server = createServer(this.app);
     this.port = process.env.PORT ?? ConfigServer.port;
-    this.apiPath = {
-      consolidate: "/",
-    };
-
+    this.apiPath = { consolidate: "/" };
     this.middlewares();
     this.conectarDB().catch((e) => logger.error(e));
     this.routes();
-    this.globalErrorHandler(); 
+    this.globalErrorHandler();
   }
 
   async conectarDB() {
     await dbConnection();
     if (process.env.NODE_ENV !== 'production') {
-      logger.debug(process.env.URLSERVER);
-      logger.debug(process.env.SQLHOST);
+      logger.debug('Database connection established');
     }
   }
 
   middlewares() {
-    
     this.app.disable('x-powered-by');
-
-    
-    const allowedOrigins = [
-      'https://hansolo.dda.sodimac.cl',
-      'https://thanos.dda.sodimac.cl',
-      'https://kurama.dda.sodimac.cl',
-      'https://obito.dda.sodimac.cl',
-      'https://trazabilidad-hub.dda.sodimac.cl'
-    ];
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean);
 
     this.app.use(cors({
       origin: (origin, callback) => {
-        
-        if (!origin) return callback(null, true);
-
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-          return callback(null, true);
-        } else {
-          return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'));
-        }
+        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error('CORS_ORIGIN_NOT_ALLOWED'));
       }
     }));
 
-    
     this.app.use((req, res, next) => {
       res.setHeader('X-Content-Type-Options', 'nosniff');
       res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-      
       res.removeHeader('Server');
       next();
     });
 
-    
     this.app.use(mongoSanitize());
-
-    
     this.app.use(xss());
-
-    
     this.app.use(express.json({ limit: "50mb" }));
-
-    if (process.env.NODE_ENV !== 'production') {
-      this.app.use(morgan("dev"));
-    }
+    if (process.env.NODE_ENV !== 'production') this.app.use(morgan("dev"));
   }
 
   routes() {
@@ -104,17 +78,15 @@ export default class Server {
 
   globalErrorHandler() {
     this.app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-      
       if (err instanceof SyntaxError && 'body' in err) {
-        logger.error(`JSON malformado: ${err.message}`);
+        logger.error('Malformed JSON request');
         return res.status(400).json({ error: 'Bad Request: Malformed JSON' });
       }
-
-      
-      logger.error(err);
-      if (!res.headersSent) {
-        res.status(500).json({ error: 'Internal Server Error' });
+      if (err.message === 'CORS_ORIGIN_NOT_ALLOWED') {
+        return res.status(403).json({ error: 'CORS policy violation' });
       }
+      logger.error('Internal server error');
+      if (!res.headersSent) res.status(500).json({ error: 'Internal Server Error' });
     });
   }
 

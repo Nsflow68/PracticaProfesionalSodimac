@@ -1,32 +1,22 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
+const dbConnection = async () => {
+    const uri = process.env.MONGO_URI;
+    if (!uri) {
+        throw new Error('MONGO_URI environment variable is required');
+    }
 
-const uriLocal = `mongodb://${process.env.USER}:${process.env.PASS}@${process.env.IP}:${process.env.PORT}/${process.env.SCHEMA}`
-
-
-
-
-const dbConnection = async() => {
     try {
-        mongoose.connect(
-            uriLocal,
-            {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
-                
-                
-            }
-        ).catch(e => console.error(e));
+        await mongoose.connect(uri);
         if (process.env.NODE_ENV !== 'production') {
-            console.log('Base de datos online activa');
+            console.log('Database connection established');
         }
-
     } catch (error) {
         if (process.env.NODE_ENV !== 'production') {
-            console.log(error);
+            console.error('Database connection failed');
         }
         throw new Error('Error al iniciar base de datos');
     }
-}
+};
 
-module.exports=dbConnection;
+module.exports = dbConnection;

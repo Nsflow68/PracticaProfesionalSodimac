@@ -1,12 +1,12 @@
 import configServer from "./../config.json";
 
 export class URLservicesProvider {
-    static prod = 'https://hansolo.dda.sodimac.cl';
-    static test = 'https://thanos.dda.sodimac.cl';
-    static dev = 'http://localhost';
+    static prod = process.env.URLSERVER_PROD ?? '';
+    static test = process.env.URLSERVER_TEST ?? '';
+    static dev = process.env.URLSERVER_DEV ?? 'http://localhost';
     static venv = process.env.URLSERVER ?? 'http://localhost';
 }
 
-export class ConfigServer{
+export class ConfigServer {
     static port: string = configServer.portApp;
 }

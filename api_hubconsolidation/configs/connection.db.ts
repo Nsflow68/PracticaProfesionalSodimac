@@ -5,11 +5,12 @@ import { selectData } from "../services/extractData.services";
 import { logger } from "../utils/logger";
 
 
-const uri = "mongodb://trazahub_db:wGAGKv5Hou@xizor.sodimac.cl:27017/TRAZAHUB";
+const uri = process.env.MONGO_URI;
 set("strictQuery", false);
 
 export const dbConnection = async () => {
   try {
+    if (!uri) throw new Error("MONGO_URI environment variable is required");
     await connect(uri);
   } catch (error) {
     logger.error(error);
